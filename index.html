@@ -302,6 +302,8 @@ footer a{text-decoration:none;border-bottom:1px solid var(--line)}
               <button class="chip" data-v="floral y suave" aria-pressed="false">Floral</button>
               <button class="chip" data-v="en azul clásico" aria-pressed="false">Azul clásico</button>
               <button class="chip" data-v="colorido y divertido" aria-pressed="false">Colorido</button>
+              <button class="chip" data-v="rústico" aria-pressed="false">Rústico</button>
+              <button class="chip" data-v="vintage" aria-pressed="false">Vintage</button>
             </div></div>
           <div class="q"><span class="eyebrow">¿Qué tipo de pieza?</span>
             <div class="opts" data-q="kind">
@@ -309,6 +311,12 @@ footer a{text-decoration:none;border-bottom:1px solid var(--line)}
               <button class="chip" data-v="una maceta" aria-pressed="false">Maceta</button>
               <button class="chip" data-v="una taza" aria-pressed="false">Taza</button>
               <button class="chip" data-v="una pieza para colgar" aria-pressed="false">Para la pared</button>
+              <button class="chip" data-v="mates" aria-pressed="false">Mates</button>
+            </div></div>
+          <div class="q"><span class="eyebrow">¿Para qué ocasión? (opcional)</span>
+            <div class="opts" data-q="occ" data-optional="1">
+              <button class="chip" data-v="cumpleaños" aria-pressed="false">Cumpleaños</button>
+              <button class="chip" data-v="casamiento" aria-pressed="false">Casamiento</button>
             </div></div>
           <div class="out">
             <label class="eyebrow" for="msg" style="display:block;margin-bottom:8px">Tu mensaje</label>
@@ -507,18 +515,19 @@ footer a{text-decoration:none;border-bottom:1px solid var(--line)}
   document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;if(!$('cart').hidden)closeCart();else if(!lb.hidden)close()});
 
   // Gift builder
-  var sel={who:'mamá',style:'con corazones y rosa',kind:'cuencos o platos'};
+  var sel={who:'mamá',style:'con corazones y rosa',kind:'cuencos o platos',occ:''};
   var ta=$('msg'),st=$('status');
   function build(){
     var forWho=sel.who==='mi casa'?'para mi casa':'para regalarle a '+sel.who;
-    ta.value='¡Hola, Esencia! Estoy buscando '+sel.kind+' '+forWho+', de estilo '+sel.style.replace(/^con |^en /,'')+'. ¿Qué piezas tienen disponibles y qué precio tienen? ¡Gracias!';
+    var oc=sel.occ?(sel.occ==='cumpleaños'?' Es para un cumpleaños.':' Es para un casamiento.'):'';
+    ta.value='¡Hola, Esencia! Estoy buscando '+sel.kind+' '+forWho+', de estilo '+sel.style.replace(/^con |^en /,'')+'.'+oc+' ¿Qué piezas tienen disponibles y qué precio tienen? ¡Gracias!';
     $('wa').href=WA+'?text='+encodeURIComponent(ta.value);
     st.textContent='';
   }
   document.querySelectorAll('.opts[data-q]').forEach(function(box){
     var q=box.dataset.q,btns=box.querySelectorAll('.chip');
     btns.forEach(function(b){b.addEventListener('click',function(){
-      sel[q]=b.dataset.v;btns.forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});build();
+      var was=b.getAttribute('aria-pressed')==='true';var opt=box.dataset.optional==='1';sel[q]=(opt&&was)?'':b.dataset.v;btns.forEach(function(x){x.setAttribute('aria-pressed',String(x===b&&!(opt&&was)))});build();
     })});
   });
   $('copy').addEventListener('click',function(){
