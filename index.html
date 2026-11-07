@@ -6,7 +6,10 @@
 <style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Esencia Tienda Deco</title>
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&family=Young+Serif&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;700&family=Young+Serif&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;700&family=Young+Serif&display=swap"></noscript>
 <style>
 /* Layout: hero with photo collage → pieces gallery (lightbox) → gift builder that writes your DM → why → visit (address + hours) → FAQ → closing */
 :root{
@@ -113,6 +116,11 @@ section{padding-block:88px 0}
 .lb[hidden]{display:none}
 .lb-box{background:var(--surface);max-width:900px;width:100%;max-height:100%;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);overflow:auto}
 .lb-box img{width:100%;height:100%;max-height:80vh;object-fit:cover;display:block}
+.lb-thumbs{display:flex;gap:8px;flex-wrap:wrap}
+.lb-thumbs[hidden]{display:none}
+.lb-thumbs button{padding:0;border:2px solid transparent;background:none;cursor:pointer;width:56px;height:70px;overflow:hidden;border-radius:6px;opacity:.7}
+.lb-thumbs button[aria-pressed="true"]{border-color:var(--blue);opacity:1}
+.lb-thumbs img{width:100%;height:100%;object-fit:cover;display:block}
 .lb-txt{padding:28px;display:flex;flex-direction:column;gap:14px;justify-content:center}
 .lb-txt h3{font-size:30px}
 .lb-txt p{margin:0;color:var(--muted)}
@@ -233,7 +241,7 @@ footer a{text-decoration:none;border-bottom:1px solid var(--line)}
 
 <div class="wrap">
   <header>
-    <a class="logo" href="#top"><span class="mark"><img src="logo.png" alt="Logo de Esencia Tienda Deco"></span><span>Esencia<small>Tienda Deco</small></span></a>
+    <a class="logo" href="#top"><span class="mark"><img src="logo.png" alt="Logo de Esencia Tienda Deco" width="169" height="234" decoding="async"></span><span>Esencia<small>Tienda Deco</small></span></a>
     <nav>
       <a href="#piezas">Piezas</a>
       <a href="#regalo">Armá tu regalo</a>
@@ -257,10 +265,10 @@ footer a{text-decoration:none;border-bottom:1px solid var(--line)}
         </div>
       </div>
       <div class="collage">
-        <figure class="c1"><img src="cuencos-corazon.jpg" alt="Cuencos de cerámica con forma de corazón pintados a mano en rosa" loading="eager"></figure>
+        <figure class="c1"><img src="alhajero-corazones.jpg" alt="Alhajero con forma de corazón, pintado a mano con lunares rosas" loading="eager"></figure>
         <figure class="c2"><img src="macetas-buho.jpg" alt="Dos macetas de cerámica con forma de búho, una rosa y una celeste"></figure>
-        <figure class="c3"><img src="taza-rayada.jpg" alt="Taza de cerámica rayada en lila sobre un plato corazón y un mantel tejido"></figure>
-        <figure class="c4"><img src="macetas-corazones.jpg" alt="Macetas de cerámica con corazones y plantas sobre un estante"></figure>
+        <figure class="c3"><img src="taza-arandanos.jpg" alt="Taza esmaltada lila con tapa sobre un plato corazón y un mantel tejido"></figure>
+        <figure class="c4"><img src="maceta-corazon.jpg" alt="Macetas de cerámica con corazones rosas sobre un estante"></figure>
         <div class="stamp"><span class="hand">hecho a mano</span><small>cada pieza es única</small></div>
       </div>
     </div>
@@ -414,6 +422,7 @@ footer a{text-decoration:none;border-bottom:1px solid var(--line)}
     <img id="lbImg" src="" alt="">
     <div class="lb-txt">
       <span class="eyebrow" id="lbTag"></span>
+      <div class="lb-thumbs" id="lbThumbs" hidden></div>
       <h3 id="lbTitle"></h3>
       <span class="price" id="lbPrice"></span>
       <p id="lbText"></p>
@@ -428,8 +437,8 @@ footer a{text-decoration:none;border-bottom:1px solid var(--line)}
 <script>
 (function(){
   var WA="https://wa.me/5493624860016";
-    var LABEL={regalo:'Para regalar',casa:'Para tu casa',plantas:'Plantas'};
-  var items=(window.PRODUCTOS||[]).map(function(p){return {img:p.foto,c:p.categoria,l:LABEL[p.categoria]||'Piezas',n:p.nombre,p:Number(p.precio)||0,a:p.descripcion||''}});
+    var LABEL={regalo:'Regalo',casa:'Casa',plantas:'Plantas'};
+  var items=(window.PRODUCTOS||[]).map(function(p){var cs=[].concat(p.categoria||[]),fs=[].concat(p.foto||[]);return {imgs:fs,img:fs[0],cs:cs,l:cs.map(function(c){return LABEL[c]||c}).join(' · '),n:p.nombre,p:Number(p.precio)||0,a:p.descripcion||''}});
   function money(n){return '$'+n.toLocaleString('es-AR')}
   var $=function(id){return document.getElementById(id)};
 
@@ -437,14 +446,14 @@ footer a{text-decoration:none;border-bottom:1px solid var(--line)}
   var g=$('gallery');
   items.forEach(function(it,i){
     var d=document.createElement('div');
-    d.className='piece';d.dataset.c=it.c;
+    d.className='piece';d.dataset.c=it.cs.join(' ');
     d.innerHTML='<button type="button" class="open" data-open="'+i+'"><span class="ph"><img src="'+it.img+'" alt="'+it.n+'" loading="lazy"></span><span class="cap"><span class="ttl">'+it.n+'</span><span class="tag">'+it.l+'</span></span></button><div class="foot"><span class="price">'+money(it.p)+'</span><button type="button" class="add" data-add="'+i+'">Agregar +</button></div>';
     g.appendChild(d);
   });
   var fb=document.querySelectorAll('[data-f]');
   fb.forEach(function(b){b.addEventListener('click',function(){
     fb.forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});
-    g.querySelectorAll('.piece').forEach(function(p){p.hidden=!(b.dataset.f==='all'||p.dataset.c===b.dataset.f)});
+    g.querySelectorAll('.piece').forEach(function(p){p.hidden=!(b.dataset.f==='all'||(' '+p.dataset.c+' ').indexOf(' '+b.dataset.f+' ')>-1)});
   })});
 
   // Cart state
@@ -500,6 +509,8 @@ footer a{text-decoration:none;border-bottom:1px solid var(--line)}
   var lb=$('lb'),last=null,cur=0;
   function open(i,from){var it=items[i];last=from;cur=i;
     $('lbImg').src=it.img;$('lbImg').alt=it.n;
+    var th=$('lbThumbs');th.innerHTML='';th.hidden=it.imgs.length<2;
+    if(it.imgs.length>1)it.imgs.forEach(function(src,j){var b=document.createElement('button');b.type='button';b.setAttribute('aria-pressed',String(j===0));b.setAttribute('aria-label','Ver foto '+(j+1)+' de '+it.n);b.innerHTML='<img src="'+src+'" alt="">';b.addEventListener('click',function(){$('lbImg').src=src;th.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))})});th.appendChild(b)});
     $('lbTag').textContent=it.l;$('lbTitle').textContent=it.n;
     $('lbText').textContent=it.a;$('lbPrice').textContent=money(it.p);
     $('lbDm').href=WA+'?text='+encodeURIComponent('¡Hola, Esencia! Me gustó esta pieza: '+it.n+' ('+money(it.p)+'). ¿Está disponible?');
